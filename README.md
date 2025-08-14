@@ -151,7 +151,7 @@ python confluence_page_dates.py MARKETING --date-viewed
 1. **403 Permission Denied**: Check your credentials and ensure you have access to the specified space
 2. **Connection Timeout**: Verify your Confluence URL is correct and accessible
 3. **Empty Results**: Confirm the space key exists and contains pages
-4. **View Data Unavailable**: Some Confluence instances may not have analytics enabled
+4. **View Data Shows "N/A"**: Page view analytics are often not available through the REST API. This is a limitation of most Confluence instances where analytics are either disabled, not accessible via API, or require special permissions. The `--date-modified` option will work reliably, but `--date-viewed` may return "N/A" for all pages.
 
 ### Getting Help
 

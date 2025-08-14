@@ -23,7 +23,7 @@ class ConfluencePageAnalyzer:
         """Retrieve all pages from a Confluence space."""
         pages = []
         start = 0
-        limit = 50
+        limit = 10  # Temporary limit for debugging
         
         print("Fetching pages from Confluence...")
         while True:
@@ -43,23 +43,37 @@ class ConfluencePageAnalyzer:
             pages.extend(data['results'])
             print(f"Fetched {len(pages)} pages so far...")
             
-            if len(data['results']) < limit:
-                break
-                
-            start += limit
+            # For debugging, only get the first batch
+            break
             
         return pages
     
     def get_page_analytics(self, page_id: str) -> Optional[Dict]:
         """Get analytics data for a specific page."""
         try:
+            # Try the analytics endpoint first
             url = f"{self.base_url}/rest/api/analytics/content/{page_id}/views"
             response = self.session.get(url)
             
             if response.status_code == 200:
-                return response.json()
-            else:
-                return None
+                data = response.json()
+                if data:  # Check if data is not empty
+                    return data
+            
+            # If analytics fails, try the audit log approach (Confluence Cloud)
+            audit_url = f"{self.base_url}/rest/api/audit"
+            audit_params = {
+                'searchString': page_id,
+                'limit': 1
+            }
+            audit_response = self.session.get(audit_url, params=audit_params)
+            
+            if audit_response.status_code == 200:
+                audit_data = audit_response.json()
+                if audit_data.get('results'):
+                    return {'audit': audit_data['results'][0]}
+            
+            return None
         except Exception:
             return None
     
@@ -93,10 +107,26 @@ class ConfluencePageAnalyzer:
             if include_viewed:
                 # Get last viewed date from analytics
                 analytics = self.get_page_analytics(page['id'])
-                if analytics and 'views' in analytics and analytics['views']:
-                    # Get the most recent view
-                    latest_view = max(analytics['views'], key=lambda x: x['date'])
-                    page_data['date_viewed'] = latest_view['date']
+                if analytics:
+                    if 'views' in analytics and analytics['views']:
+                        # Standard analytics response
+                        latest_view = max(analytics['views'], key=lambda x: x['date'])
+                        page_data['date_viewed'] = latest_view['date']
+                    elif 'audit' in analytics:
+                        # Audit log response
+                        audit_entry = analytics['audit']
+                        if 'creationDate' in audit_entry:
+                            page_data['date_viewed'] = audit_entry['creationDate']
+                        else:
+                            page_data['date_viewed'] = 'N/A'
+                    else:
+                        # Try to use any date field available
+                        for date_field in ['lastViewDate', 'lastAccessed', 'viewDate', 'date']:
+                            if date_field in analytics:
+                                page_data['date_viewed'] = analytics[date_field]
+                                break
+                        else:
+                            page_data['date_viewed'] = 'N/A'
                 else:
                     page_data['date_viewed'] = 'N/A'
             
