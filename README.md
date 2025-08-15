@@ -77,19 +77,21 @@ The generated CSV will contain the following columns based on your options:
 ### Modified Dates Only (`--date-modified`)
 | page | page_url | date_modified |
 |------|----------|---------------|
-| Page Title | https://company.atlassian.net/wiki/display/SPACE/123456 | 2024-08-14 10:30:15 |
+| Team Meeting Notes | https://company.atlassian.net/wiki/display/SPACE/Team+A/Meeting+Notes | 2024-08-14 10:30:15 |
 
 ### View Dates Only (`--date-viewed`)
 | page | page_url | date_viewed |
 |------|----------|-------------|
-| Page Title | https://company.atlassian.net/wiki/display/SPACE/123456 | 2024-08-13 14:22:10 |
+| Development Guide | https://company.atlassian.net/wiki/display/SPACE/Development/Setup+Guide | 2024-08-13 14:22:10 |
 
 ### Both Dates (`--date-modified --date-viewed`)
 | page | page_url | date_modified | date_viewed |
 |------|----------|---------------|-------------|
-| Page Title | https://company.atlassian.net/wiki/display/SPACE/123456 | 2024-08-14 10:30:15 | 2024-08-13 14:22:10 |
+| Project Overview | https://company.atlassian.net/wiki/display/SPACE/Projects/Overview | 2024-08-14 10:30:15 | 2024-08-13 14:22:10 |
 
 **Sorting**: Results are automatically sorted by date in descending order (most recent first).
+
+**URL Structure**: Page URLs include the full path structure (e.g., `/display/SPACE/Team+A/Meeting+Notes`) making it easy to filter results by team areas, sections, or content hierarchy using spreadsheet tools.
 
 ## Progress Tracking
 

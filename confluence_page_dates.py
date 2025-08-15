@@ -33,7 +33,7 @@ class ConfluencePageAnalyzer:
                 'type': 'page',
                 'start': start,
                 'limit': limit,
-                'expand': 'version,history.lastUpdated,space'
+                'expand': 'version,history.lastUpdated,space,_links'
             }
             
             response = self.session.get(url, params=params)
@@ -85,8 +85,11 @@ class ConfluencePageAnalyzer:
         print(f"Found {total_pages} pages to analyze...")
         
         for i, page in enumerate(pages, 1):
-            # Construct page URL
-            page_url = f"{self.base_url}/display/{page['space']['key']}/{page['id']}"
+            # Construct page URL using web UI link if available, fallback to page ID
+            if '_links' in page and 'webui' in page['_links']:
+                page_url = f"{self.base_url}{page['_links']['webui']}"
+            else:
+                page_url = f"{self.base_url}/display/{page['space']['key']}/{page['id']}"
             
             page_data = {
                 'page': page['title'],
