@@ -23,7 +23,7 @@ class ConfluencePageAnalyzer:
         """Retrieve all pages from a Confluence space."""
         pages = []
         start = 0
-        limit = 10  # Temporary limit for debugging
+        limit = 50
         
         print("Fetching pages from Confluence...")
         while True:
@@ -43,8 +43,10 @@ class ConfluencePageAnalyzer:
             pages.extend(data['results'])
             print(f"Fetched {len(pages)} pages so far...")
             
-            # For debugging, only get the first batch
-            break
+            if len(data['results']) < limit:
+                break
+                
+            start += limit
             
         return pages
     
